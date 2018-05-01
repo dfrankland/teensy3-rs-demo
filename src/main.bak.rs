@@ -19,19 +19,7 @@ pub unsafe extern fn main() {
 
     let ser = Serial {};
 
-    let watchdog = mk20d7_hal::wdog::Watchdog::new(&*dp.WDOG);
-    if watchdog.is_enabled() {
-        send(&ser, "Watchdog is enabled.\n\r").unwrap();
-
-        if watchdog.allow_update() {
-            send(&ser, "Watchdog disabled.\n\r").unwrap();
-            watchdog.disable();
-        } else {
-            send(&ser, "Watchdog is not allowed to update.\n\r").unwrap();
-        }
-    } else {
-        send(&ser, "Watchdog is already disabled.\n\r").unwrap();
-    }
+    
 
     let portc = (dp.PTC, dp.PORTC).split(&(&*dp.SIM).scgc5);
     let mut ptc5 = portc.ptc5.into_push_pull_output();
