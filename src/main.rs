@@ -19,13 +19,20 @@ pub unsafe extern fn main() {
 
     let ser = Serial {};
 
+    // Watchdog Disabling
     let watchdog = mk20d7_hal::wdog::Watchdog::new(&*dp.WDOG);
     if watchdog.is_enabled() {
         send(&ser, "Watchdog is enabled.\n\r").unwrap();
 
         if watchdog.allow_update() {
-            send(&ser, "Watchdog disabled.\n\r").unwrap();
+            send(&ser, "Watchdog disabling now.\n\r").unwrap();
             watchdog.disable();
+
+            if watchdog.is_enabled() {
+                send(&ser, "Watchdog is still enabled.\n\r").unwrap();
+            } else {
+                send(&ser, "Watchdog is now disabled.\n\r").unwrap();
+            }
         } else {
             send(&ser, "Watchdog is not allowed to update.\n\r").unwrap();
         }
