@@ -40,6 +40,26 @@ pub unsafe extern fn main() {
         send(&ser, "Watchdog is already disabled.\n\r").unwrap();
     }
 
+    // Oscillator enabling to 10 pF
+    let oscillator = mk20d7_hal::osc::Oscillator::new(&*dp.OSC);
+    if oscillator.is_enabled() {
+        send(&ser, "Oscillator is already enabled.\n\r").unwrap();
+    } else {
+        send(&ser, "Oscillator is disabled; enabling it now.\n\r").unwrap();
+        oscillator.enable();
+    }
+    if oscillator.get_capacitance() == 10 {
+        send(&ser, "Oscillator is already set to 10.\n\r").unwrap();
+    } else {
+        send(&ser, "Oscillator is not set to 10, setting to 10 now.\n\r").unwrap();
+        oscillator.set_capacitance(10);
+        if oscillator.get_capacitance() == 10 {
+            send(&ser, "Oscillator is now set to 10.\n\r").unwrap();
+        } else {
+            send(&ser, "Oscillator is still not set to 10!\n\r").unwrap();
+        }
+    }
+
     let portc = (dp.PTC, dp.PORTC).split(&(&*dp.SIM).scgc5);
     let mut ptc5 = portc.ptc5.into_push_pull_output();
 
