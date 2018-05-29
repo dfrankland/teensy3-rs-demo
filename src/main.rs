@@ -60,6 +60,20 @@ pub unsafe extern fn main() {
         }
     }
 
+    // System Integration Module
+    let mut sim = mk20d7_hal::sim::SystemIntegrationModule::new(&*dp.SIM);
+    if sim.get_dividers() == (1, 2, 3) {
+        send(&ser, "System Integration Module is already set to core 1, bus 2, and flash 3.\n\r").unwrap();
+    } else {
+        send(&ser, "System Integration Module is not set to core 1, bus 2, and flash 3; setting them now.\n\r").unwrap();
+        sim.set_dividers(1, 2, 3);
+        if sim.get_dividers() == (1, 2, 3) {
+            send(&ser, "System Integration Module is now set to core 1, bus 2, and flash 3.\n\r").unwrap();
+        } else {
+            send(&ser, "System Integration Module is still not set to core 1, bus 2, and flash 3.\n\r").unwrap();
+        }
+    }
+
     let portc = (dp.PTC, dp.PORTC).split(&(&*dp.SIM).scgc5);
     let mut ptc5 = portc.ptc5.into_push_pull_output();
 
