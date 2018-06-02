@@ -4,6 +4,7 @@
 extern crate teensy3;
 extern crate mk20d7_hal;
 extern crate embedded_hal;
+extern crate cortex_m;
 
 use teensy3::bindings;
 use teensy3::serial::Serial;
@@ -12,15 +13,25 @@ use mk20d7_hal::mk20d7;
 
 #[no_mangle]
 pub unsafe extern fn main() {
+    let cp = cortex_m::Peripherals::take().unwrap();
     let dp = mk20d7::Peripherals::take().unwrap();
+
+    let watchdog = mk20d7_hal::wdog::Watchdog::new(&*dp.WDOG);
+    watchdog.disable();
+    let oscillator = mk20d7_hal::osc::Oscillator::new(&*dp.OSC);
+    oscillator.enable();
+    oscillator.set_capacitance(10);
+    let mut sim = mk20d7_hal::sim::SystemIntegrationModule::new(&*dp.SIM);
+    sim.set_dividers(1, 2, 3);
+    let mut delay = mk20d7_hal::delay::Delay::new(cp.SYST, &sim);
 
     // Wait for th oscillator frequency to stabilize
     bindings::delay(200);
+    delay.delay_ms(200_u16);
 
     let ser = Serial {};
 
     // Watchdog Disabling
-    let watchdog = mk20d7_hal::wdog::Watchdog::new(&*dp.WDOG);
     if watchdog.is_enabled() {
         send(&ser, "Watchdog is enabled.\n\r").unwrap();
 
@@ -41,7 +52,6 @@ pub unsafe extern fn main() {
     }
 
     // Oscillator enabling to 10 pF
-    let oscillator = mk20d7_hal::osc::Oscillator::new(&*dp.OSC);
     if oscillator.is_enabled() {
         send(&ser, "Oscillator is already enabled.\n\r").unwrap();
     } else {
@@ -61,12 +71,11 @@ pub unsafe extern fn main() {
     }
 
     // System Integration Module
-    let mut sim = mk20d7_hal::sim::SystemIntegrationModule::new(&*dp.SIM);
     if sim.get_dividers() == (1, 2, 3) {
         send(&ser, "System Integration Module is already set to core 1, bus 2, and flash 3.\n\r").unwrap();
     } else {
         send(&ser, "System Integration Module is not set to core 1, bus 2, and flash 3; setting them now.\n\r").unwrap();
-        sim.set_dividers(1, 2, 3);
+        // sim.set_dividers(1, 2, 3);
         if sim.get_dividers() == (1, 2, 3) {
             send(&ser, "System Integration Module is now set to core 1, bus 2, and flash 3.\n\r").unwrap();
         } else {
@@ -79,25 +88,25 @@ pub unsafe extern fn main() {
 
     loop {
         // Show we are alive
-        alive(&mut ptc5);
+        alive(&mut ptc5, &mut delay);
 
         // If the serial write fails, we will halt (no more alive blinks)
         send(&ser, "Hello Teensy Rusty World!\n\r").unwrap();
 
         // Don't spam the console
-        bindings::delay(1000);
+        delay.delay_ms(200_u16);
     }
 }
 
 /// Blink the light twice to know we're alive
-pub unsafe fn alive<P: embedded_hal::digital::OutputPin>(pin: &mut P) {
+pub unsafe fn alive<P: embedded_hal::digital::OutputPin, D: embedded_hal::blocking::delay::DelayMs<u16>>(pin: &mut P, delay: &mut D) {
     for _ in 0..2 {
         pin.set_low();
-        bindings::delay(200);
+        delay.delay_ms(200_u16);
         pin.set_high();
-        bindings::delay(200);
+        delay.delay_ms(200_u16);
         pin.set_low();
-        bindings::delay(200);
+        delay.delay_ms(200_u16);
     }
 }
 
