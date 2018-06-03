@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+#[macro_use(entry)]
+extern crate cortex_m_rt;
 extern crate teensy3;
 extern crate mk20d7_hal;
 extern crate embedded_hal;
@@ -9,8 +11,9 @@ extern crate cortex_m;
 use mk20d7_hal::prelude::*;
 use mk20d7_hal::mk20d7;
 
-#[no_mangle]
-pub extern fn main() {
+entry!(main);
+
+fn main() -> ! {
     let cp = cortex_m::Peripherals::take().unwrap();
     let dp = mk20d7::Peripherals::take().unwrap();
 
