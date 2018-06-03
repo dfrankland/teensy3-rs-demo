@@ -33,16 +33,16 @@ fn main() -> ! {
             let fbe: mk20d7_hal::mcg::Fbe = fei.into();
             let pbe: mk20d7_hal::mcg::Pbe = fbe.into();
             let _pee: mk20d7_hal::mcg::Pee = pbe.into();
-            "Fei"
         },
-        mk20d7_hal::mcg::ClockMode::Fee(_) => "Fee",
-        mk20d7_hal::mcg::ClockMode::Fbi(_) => "Fbi",
-        mk20d7_hal::mcg::ClockMode::Fbe(_) => "Fbe",
-        mk20d7_hal::mcg::ClockMode::Pee(_) => "Pee",
-        mk20d7_hal::mcg::ClockMode::Pbe(_) => "Pbe",
-        mk20d7_hal::mcg::ClockMode::Blpi(_) => "Blpi",
-        mk20d7_hal::mcg::ClockMode::Blpe(_) => "Blpe",
-        mk20d7_hal::mcg::ClockMode::Stop(_) => "Stop",
+        mk20d7_hal::mcg::ClockMode::Fbe(fbe) => {
+            let pbe: mk20d7_hal::mcg::Pbe = fbe.into();
+            let _pee: mk20d7_hal::mcg::Pee = pbe.into();
+        },
+        mk20d7_hal::mcg::ClockMode::Pbe(pbe) => {
+            let _pee: mk20d7_hal::mcg::Pee = pbe.into();
+        },
+        mk20d7_hal::mcg::ClockMode::Pee(_) => {},
+        _ => panic!("Clock mode is unsupported!"),
     };
 
     let mut delay = mk20d7_hal::delay::Delay::new(cp.SYST, &sim);
