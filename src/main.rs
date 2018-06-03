@@ -83,7 +83,7 @@ pub unsafe extern fn main() {
         }
     }
 
-    let portc = (dp.PTC, dp.PORTC).split(&(&*dp.SIM).scgc5);
+    let portc = (dp.PTC, dp.PORTC).split(&dp.SIM.scgc5);
     let mut ptc5 = portc.ptc5.into_push_pull_output();
 
     loop {
