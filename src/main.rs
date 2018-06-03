@@ -99,7 +99,7 @@ pub unsafe extern fn main() {
 }
 
 /// Blink the light twice to know we're alive
-pub unsafe fn alive<P: embedded_hal::digital::OutputPin, D: embedded_hal::blocking::delay::DelayMs<u16>>(pin: &mut P, delay: &mut D) {
+pub fn alive<P: embedded_hal::digital::OutputPin, D: embedded_hal::blocking::delay::DelayMs<u16>>(pin: &mut P, delay: &mut D) {
     for _ in 0..2 {
         pin.set_low();
         delay.delay_ms(200_u16);
