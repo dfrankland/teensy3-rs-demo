@@ -47,8 +47,8 @@ fn main() -> ! {
 
     let mut delay = mk20d7_hal::delay::Delay::new(cp.SYST, &sim);
 
-    let portc = (dp.PTC, dp.PORTC).split(&dp.SIM.scgc5);
-    let mut ptc5 = portc.ptc5.into_push_pull_output();
+    let mut gpioc = (dp.PTC, dp.PORTC).split(&dp.SIM.scgc5);
+    let mut ptc5 = gpioc.ptc5.into_push_pull_output(&mut gpioc.pcr, &mut gpioc.pddr);
 
     loop {
         alive(&mut ptc5, &mut delay);
