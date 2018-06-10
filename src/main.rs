@@ -56,13 +56,15 @@ fn main() -> ! {
 }
 
 /// Blink the light twice to know we're alive
-fn alive<P: embedded_hal::digital::OutputPin, D: embedded_hal::blocking::delay::DelayMs<u16>>(pin: &mut P, delay: &mut D) {
+fn alive<P: embedded_hal::digital::ToggleableOutputPin, D: embedded_hal::blocking::delay::DelayMs<u16>>(pin: &mut P, delay: &mut D) {
     for _ in 0..2 {
-        pin.set_low();
+        pin.toggle();
         delay.delay_ms(200_u16);
-        pin.set_high();
+        pin.toggle();
         delay.delay_ms(200_u16);
-        pin.set_low();
+        pin.toggle();
+        delay.delay_ms(200_u16);
+        delay.delay_ms(200_u16);
         delay.delay_ms(200_u16);
     }
 }
