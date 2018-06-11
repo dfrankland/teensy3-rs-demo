@@ -7,9 +7,12 @@ extern crate teensy3;
 extern crate mk20d7_hal;
 extern crate embedded_hal;
 extern crate cortex_m;
+extern crate bitrate;
 
 use mk20d7_hal::prelude::*;
 use mk20d7_hal::mk20d7;
+
+use bitrate::U32BitrateExt;
 
 entry!(main);
 
@@ -27,7 +30,7 @@ fn main() -> ! {
     let mut sim = mk20d7_hal::sim::SystemIntegrationModule::new(&*dp.SIM);
     sim.set_dividers(1, 2, 3);
 
-    let mut mcg = mk20d7_hal::mcg::MultipurposeClockGenerator::new(&*dp.MCG);
+    let mut mcg = mk20d7_hal::mcg::MultipurposeClockGenerator::new(&*dp.MCG, 16.mhz());
     match mcg.clock_mode() {
         mk20d7_hal::mcg::ClockMode::Fei(fei) => {
             let fbe: mk20d7_hal::mcg::Fbe = fei.into();
